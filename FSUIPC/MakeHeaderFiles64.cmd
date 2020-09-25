@@ -1,0 +1,1 @@
+"C:\Program Files\AdoptOpenJDK\jdk-11.0.7.10-hotspot\bin\javac.exe" -h inc src\com\mouseviator\fsuipc\FSUIPCWrapper.java

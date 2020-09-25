@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30011.22
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fsuipc_java64", "fsuipc_java64\fsuipc_java64.vcxproj", "{F77E6FA4-B7FE-4130-8949-6D7E78964BBE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F77E6FA4-B7FE-4130-8949-6D7E78964BBE}.Debug|x64.ActiveCfg = Debug|x64
+		{F77E6FA4-B7FE-4130-8949-6D7E78964BBE}.Debug|x64.Build.0 = Debug|x64
+		{F77E6FA4-B7FE-4130-8949-6D7E78964BBE}.Debug|x86.ActiveCfg = Debug|Win32
+		{F77E6FA4-B7FE-4130-8949-6D7E78964BBE}.Debug|x86.Build.0 = Debug|Win32
+		{F77E6FA4-B7FE-4130-8949-6D7E78964BBE}.Release|x64.ActiveCfg = Release|x64
+		{F77E6FA4-B7FE-4130-8949-6D7E78964BBE}.Release|x64.Build.0 = Release|x64
+		{F77E6FA4-B7FE-4130-8949-6D7E78964BBE}.Release|x86.ActiveCfg = Release|Win32
+		{F77E6FA4-B7FE-4130-8949-6D7E78964BBE}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {19BE5E3E-C40C-407B-B5B6-7CC062BF7FC3}
+	EndGlobalSection
+EndGlobal

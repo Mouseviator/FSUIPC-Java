@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30225.117
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fsuipc_java32", "fsuipc_java32.vcxproj", "{242BBCFF-E9DA-4C0A-A52A-1649D0AAA356}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{242BBCFF-E9DA-4C0A-A52A-1649D0AAA356}.Debug|x64.ActiveCfg = Debug|x64
+		{242BBCFF-E9DA-4C0A-A52A-1649D0AAA356}.Debug|x64.Build.0 = Debug|x64
+		{242BBCFF-E9DA-4C0A-A52A-1649D0AAA356}.Debug|x86.ActiveCfg = Debug|Win32
+		{242BBCFF-E9DA-4C0A-A52A-1649D0AAA356}.Debug|x86.Build.0 = Debug|Win32
+		{242BBCFF-E9DA-4C0A-A52A-1649D0AAA356}.Release|x64.ActiveCfg = Release|x64
+		{242BBCFF-E9DA-4C0A-A52A-1649D0AAA356}.Release|x64.Build.0 = Release|x64
+		{242BBCFF-E9DA-4C0A-A52A-1649D0AAA356}.Release|x86.ActiveCfg = Release|Win32
+		{242BBCFF-E9DA-4C0A-A52A-1649D0AAA356}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {370FAFFA-6723-447A-8B4E-DFF4BFCF3445}
+	EndGlobalSection
+EndGlobal

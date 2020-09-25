@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Overview of the API</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <div><p>This whole Java FSUIPC SDK is based upon SDK written by Mark Burton, later amended by Paul Henty for 64 bit environment. But, it has been greatly rewritten and uses different approach.</p>
+        <p>Why the rewrite? Well, the main reason for me was performance considerations. After studying FSUIPC C SDK, the wrapper library and the Java SDK by Mark, I found out
+            that the C/C++ wrapper library (<strong>fsuipc_java64.dll</strong>, <strong>fsuipc_java32.dll</strong>), that implements the <strong>{@link com.mouseviator.fsuipc.FSUIPCWrapper#readData(int, int, byte[]) }</strong> and <strong>{@link com.mouseviator.fsuipc.FSUIPCWrapper#writeData(int, int, byte[]) }</strong> functions, calls the <strong><u>FSUIPC_Process</u></strong> function.
+            What is the catch? Well, normally when working with the FSUIPC C/C++ SDK, you call <strong><u>FSUIPC_Read</u></strong> and <strong><u>FSUIPC_Write</u></strong> functions to tell FSUIPC what data you want to read/write, kind of registering data requests, and than process all of them
+            using the <strong><u>FSUIPC_Process</u></strong> function. I have read on the forums that this function is quite heavy on processing time - thus, it is not good to call it very often. But this is how it was
+            implemented in the previous wrapper libraries. The <strong><u>FSUIPC_Process</u></strong> function got called every time you called the read or write functions. It may not cause trouble in simple projects. But, when you would read multiple values,
+         continuously, like in the loop, for example for flight monitoring app, I think that might be a performance issue sooner or later. Not mentioning, that your app probably would not be the only one that FSUIPC
+         would have to provides it's services to. That is why I decided to try to write a different SDK, that will try to reflect the approach that we would use when writing the code in C/C++. 
+         This SDK thinks of FSUIPC read/writes as of data requests. It allows you to register multiple of them and then process them all via one call of the process function.
+        </p>
+        <p>The main package of the SDK is the {@link com.mouseviator.fsuipc} package which contains the two core classes. The {@link com.mouseviator.fsuipc.FSUIPCWrapper} class, which is the "low-level" approach class. It contains
+            the native methods implemented in the fsuipc_java64.dll and fsuipc_java32.dll (libraries for 32bit/64bit JVM). The second class is the {@link com.mouseviator.fsuipc.FSUIPC} class. This class uses {@link com.mouseviator.fsuipc.FSUIPCWrapper} internally
+            and is the main class for you to use if you want to get use of the data requests approach to FSUIPC that this SDK offers. Actually, you don't even have to know about {@link com.mouseviator.fsuipc.FSUIPCWrapper} class if you want to use
+            the {@link com.mouseviator.fsuipc.FSUIPC} class.
+        </p>
+        <p>There are 4 other main packages, which all contains classes/interfaces for use with the {@link com.mouseviator.fsuipc.FSUIPC} class. The {@link com.mouseviator.fsuipc.datarequest} contains classes/interfaces being helpful/needed when
+            writing brand new type of data request class for use with the {@link com.mouseviator.fsuipc.FSUIPC} class. The {@link com.mouseviator.fsuipc.datarequest.primitives} package contains classes that implements all (well, maybe most, so I am not lying)
+            Java primitive data types of data requests for use with the {@link com.mouseviator.fsuipc.FSUIPC} class. That is, if you want to read/write byte, short, integer etc from/to the simulator. The {@link com.mouseviator.fsuipc.datarequest.advanced} contains above the primitive data requests. Well, for now it only contains the {@link com.mouseviator.fsuipc.datarequest.advanced.FSControlRequest} class,
+            which implements data request to send any FS control to flight simulator and it is not that complex either :).
+            The last package, the {@link com.mouseviator.fsuipc.helpers} (and it's sub-packages) contains couple of helper classes, that you can use to gather specific data, without having to care about FSUIPC offsets and conversions of values. For example, the 
+            {@link com.mouseviator.fsuipc.helpers.aircraft.AircraftHelper} class has the {@link com.mouseviator.fsuipc.helpers.aircraft.AircraftHelper#getIAS() } function which will return the data request to read/write aircraft IAS in knots. It will return/expect the value
+            as floating point value. Yes, there is just a couple of classes with just a couple of methods. It is nearly impossible for me to cover all FSUIPC offsets.
+        </p>
+        <p>That is for a quick overview. Read the documentation of {@link com.mouseviator.fsuipc.FSUIPC} class, where you will find more info and also some examples of the usage.</p>
+        </div>
+    </body>
+</html>

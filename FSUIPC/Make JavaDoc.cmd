@@ -1,0 +1,1 @@
+"C:\Program Files\AdoptOpenJDK\jdk-11.0.7.10-hotspot\bin\javadoc.exe" -d "p:\Java\Murdock_FSUIPC\FSUIPC\dist\javadoc" -sourcepath src -subpackages com.mouseviator -overview "p:\Java\Murdock_FSUIPC\FSUIPC\src\overview.html"
