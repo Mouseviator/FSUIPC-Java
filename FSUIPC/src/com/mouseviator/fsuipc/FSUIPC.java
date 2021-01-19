@@ -514,9 +514,13 @@ public class FSUIPC {
      */
     private final AtomicBoolean connected = new AtomicBoolean(false);
     /**
-     * Thread pool for wait for connection task and running continuous requests
+     * Thread pool for running continuous requests
      */
-    private final ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(2);
+    private ScheduledExecutorService scheduledESForCRPTask = null;
+    /**
+     * Thread pool for wait for connection task
+     */
+    private ScheduledExecutorService scheduledESForWfCTask = null;
     /**
      * A reference to task that waits for FSUIPC connection
      */
@@ -537,7 +541,7 @@ public class FSUIPC {
      */
     private void checkLastResult() {
         int lastResult = FSUIPCWrapper.getResult();
-
+        
         // in case of some error, inform all listeners
         if (lastResult != FSUIPCWrapper.FSUIPCResult.FSUIPC_ERR_OK.getValue()) {
             logger.log(Level.FINER, "Something did not go as planned! FSUIPC last result code is: {0}. Letting the listeners know!", lastResult);
@@ -589,14 +593,14 @@ public class FSUIPC {
     }
 
     /**
-     * This will add listener.
+     * This will add listener. If the listener is already present, it will not be added.
      *
      * @param listener A listener to add.
      * @return True if listener was added, false otherwise (you passed null, or
      * what {@link Collection#add(java.lang.Object) } returns.).
      */
     public boolean addListener(IFSUIPCListener listener) {
-        if (listener != null) {
+        if (listener != null && !arListeners.contains(listener)) {
             return arListeners.add(listener);
         }
         return false;
@@ -614,6 +618,13 @@ public class FSUIPC {
             return arListeners.remove(listener);
         }
         return false;
+    }
+    
+    /**
+     * This will remove all listeners
+     */
+    public void removeAllListeners() {
+        arListeners.clear();
     }
 
     /**
@@ -637,7 +648,10 @@ public class FSUIPC {
     /**
      * This method will init thread that will continuously try to connect to
      * simulator via FSUIPC till success.
-     *
+     *           
+     * <strong>WARNING:</strong> This functions will first try to stop any currently running waiting thread. This might take some time - thus may
+     * block the current thread! Should not be called from main EDT thread.
+     * 
      * @param simVersion A simulator version to which to connect.
      * @param repeatPeriod A time in seconds to repeat the connection attempts.
      * @return True if thread is successfully started, false otherwise.
@@ -645,7 +659,13 @@ public class FSUIPC {
     public boolean waitForConnection(FSUIPCWrapper.FSUIPCSimVersion simVersion, int repeatPeriod) {
         try {
             if (cancelWaitForConnectionTask()) {
-                waitForConnectionThread = scheduledExecutorService.scheduleAtFixedRate(new WaitForConnectionWorker(simVersion), 0, repeatPeriod, TimeUnit.SECONDS);
+                //Init task executor, if not initialized yet
+                if (scheduledESForWfCTask == null) {
+                    //Creating thread pool with only one thread will make sure that no more than one thread will be waiting for the connection at one time
+                    scheduledESForWfCTask = Executors.newScheduledThreadPool(1);
+                }
+                //start waiting thread
+                waitForConnectionThread = scheduledESForWfCTask.scheduleAtFixedRate(new WaitForConnectionWorker(simVersion), 0, repeatPeriod, TimeUnit.SECONDS);
                 logger.log(Level.FINER, "Started new task to wait to connection to sim via FSUIPC. Required sim version is: {0} and repeat period is: {1} seoonds.", new Object[]{getFSVersion(simVersion), repeatPeriod});
                 return true;
             }
@@ -665,8 +685,21 @@ public class FSUIPC {
         try {
             if (waitForConnectionThread != null) {
                 //cancel any currently running task
-                ((ScheduledThreadPoolExecutor) scheduledExecutorService).setRemoveOnCancelPolicy(true);
+                ((ScheduledThreadPoolExecutor) scheduledESForWfCTask).setRemoveOnCancelPolicy(true);
                 waitForConnectionThread.cancel(true);
+                //wait for the task to complete
+                while (!waitForConnectionThread.isDone()) {
+                    try {
+                        /* It is said that using Thread.sleep in the loop is bad design pattern, but here, I do not know about
+                           better solution for waiting for the thread to be completly finished.
+                        */
+                        Thread.sleep(50);
+                    } catch (InterruptedException ex) {
+                        //just continue on processing
+                        logger.log(Level.WARNING, "Interrupted while waiting for wait for FSUIPC connection thread to finish!", ex);
+                    }
+                }
+                waitForConnectionThread = null; //important so that the condition above works next time
                 logger.finer("Thread to wait for FSUIPC connection was canceled!");
             }
         } catch (Exception ex) {
@@ -679,6 +712,9 @@ public class FSUIPC {
     /**
      * This function will cancel the thread that is running the continual
      * request processing.
+     * 
+     * <strong>WARNING:</strong> This functions will try to stop any currently running processing thread. This might take some time - thus may
+     * block the current thread! Should not be called from main EDT thread.
      *
      * @return True if thread was canceled, false if there was some problem
      * (exception).
@@ -687,19 +723,30 @@ public class FSUIPC {
         try {
             if (continualRequestProcessThread != null) {
                 //cancel any currently running task
-                ((ScheduledThreadPoolExecutor) scheduledExecutorService).setRemoveOnCancelPolicy(true);
+                ((ScheduledThreadPoolExecutor) scheduledESForCRPTask).setRemoveOnCancelPolicy(true);
                 //this one, we will let finish if already running - the false parameter
                 continualRequestProcessThread.cancel(false);
                 //wait for the task to complete
                 while (!continualRequestProcessThread.isDone()) {
-                    Thread.sleep(50);
+                    try {
+                        /* It is said that using Thread.sleep in the loop is bad design pattern, but here, I do not know about
+                           better solution for waiting for the thread to be completly finished.
+                        */
+                        Thread.sleep(50);
+                    } catch (InterruptedException ex) {
+                        //just continue on processing
+                        logger.log(Level.WARNING, "Interrupted while waiting for continual request processing thread to finish!", ex);
+                    }
                 }
+                continualRequestProcessThread = null;   //important so that the condition above works next time
+                //clear array of requests
+                arContinualRequests.clear();        //added as anothe call to start request processing in one session would add request (double them and so on)
                 logger.finer("Thread for FSUIPC continual requests processing was canceled!");
             }
         } catch (Exception ex) {
             logger.log(Level.SEVERE, "Failed to cancel thread for FSUIPC continual requests processing!", ex);
             return false;
-        }
+        }               
         return true;
     }
 
@@ -710,19 +757,57 @@ public class FSUIPC {
         logger.info("Called disconnect! Will close FSUIPC connection and release resoures.");
         setConnected(false);
 
-        //cancel runnig  threads if any
-        cancelWaitForConnectionTask();
-
-        //terminate all running threads
-        try {
-            scheduledExecutorService.shutdown();
-            while (!scheduledExecutorService.isShutdown()) {
-                //wait for tasks to shutdown
-                Thread.sleep(50);
+        //cancel runnig  threads waiting for FSUIPC connection if any        
+        if (scheduledESForWfCTask != null) {
+            try {
+                scheduledESForWfCTask.shutdown();
+                while (!scheduledESForWfCTask.isShutdown()) {
+                    //wait for tasks to shutdown
+                    try {
+                        /* It is said that using Thread.sleep in the loop is bad design pattern, but here, I do not know about
+                           better solution for waiting for the executor to be completly shutdown. We could call awaitTermination,
+                           but it has tim limit and if tasks does not finish within limit, than we still have to take another action,
+                           so may not be sure the executor finished all and was shutdown
+                        */
+                        Thread.sleep(50);                        
+                    } catch (InterruptedException ex) {
+                        //just continue on processing
+                        logger.log(Level.WARNING, "Interrupted while waiting for \"Wait for FSUIPC connection\" task executor to shutdown!", ex);
+                    }
+                }
+                scheduledESForWfCTask = null;
+                waitForConnectionThread = null;
+                logger.finer("The \"Wait for FSUIPC connection\" task executor is shutdown. Thread waiting for connection is terminated.");
+            } catch (Exception ex) {
+                logger.log(Level.SEVERE, "Failed to terminate the \"Wait for FSUIPC connection\" task executor! The waiting thread might still be running!", ex);
             }
-            logger.finer("All scheduled threads stopped and executor service terminated.");
-        } catch (Exception ex) {
-            logger.log(Level.SEVERE, "Failed to terminate all scheduled threads and to stop executor service!", ex);
+        }
+
+        //terminate all running continual request processing threads
+        if (scheduledESForCRPTask != null) {
+            try {
+                scheduledESForCRPTask.shutdown();
+                while (!scheduledESForCRPTask.isShutdown()) {
+                    //wait for tasks to shutdown
+                    try {
+                        /* It is said that using Thread.sleep in the loop is bad design pattern, but here, I do not know about
+                           better solution for waiting for the executor to be completly shutdown. We could call awaitTermination,
+                           but it has tim limit and if tasks does not finish within limit, than we still have to take another action,
+                           so may not be sure the executor finished all and was shutdown
+                        */
+                        Thread.sleep(50);                        
+                    } catch (InterruptedException ex) {
+                        //just continue on processing
+                        logger.log(Level.WARNING, "Interrupted while waiting for \"Continual requests processing\" scheduled task executor to shutdown!", ex);
+                    }
+                }
+                scheduledESForCRPTask = null;
+                continualRequestProcessThread = null;
+                arContinualRequests.clear();    //added as another call to start request processing in one session would add request (double them and so on)
+                logger.finer("The \"Continual requests processing\" task executor is shutdown. Thread performing continual request processing is terminated.");
+            } catch (Exception ex) {
+                logger.log(Level.SEVERE, "Failed to terminate the \"Continual requests processing\" executor service! The thread performing continual request processing might still be running!", ex);
+            }
         }
 
         //close FSUIPC connection. We do it as last command, after cancelling all processing, as doing it as firts, may
@@ -819,15 +904,15 @@ public class FSUIPC {
 
     /**
      * Returns string representation of FSUIPC library version. Calls {@link FSUIPCWrapper#getVersion()
-     * } to get FSUIPC version as number first. Note that this version number is hard-coded in FSUIPC C lib
-     * and was not updated for years :)
+     * } to get FSUIPC version as number first. Note that this version number is
+     * hard-coded in FSUIPC C lib and was not updated for years :)
      *
      * @return String representation of FSUIPC library version.
      */
     public String getLibVersion() {
         //According to documentation the values hould be stored the same as the fsuipc vesrion, but it does not give meaningfull value
-        int version = FSUIPCWrapper.getLibVersion();                
-                       
+        int version = FSUIPCWrapper.getLibVersion();
+
         return String.format("%.3f", version / 1000.f);
     }
 
@@ -953,8 +1038,8 @@ public class FSUIPC {
         //now, process all
         int iRet = FSUIPCWrapper.process();
         //compute elapsed time
-        lastProcessingTime = System.nanoTime() - startTime;
-
+        lastProcessingTime = System.nanoTime() - startTime;       
+                   
         //return value based od process result
         if (iRet == 0) {
             checkLastResult();  //check whether we are still connected
@@ -1003,6 +1088,9 @@ public class FSUIPC {
      * functions. If processing is completed without errors, the "one time"
      * requests array will be cleared.
      *
+     * <strong>WARNING:</strong> This function will try to stop any currently running processing thread (if cancelRunning is true). This might take some time - thus may
+     * block the current thread! Should not be called from main EDT thread.
+     * 
      * @param repeatPeriod How often to process the requests. Milliseconds.
      * @param cancelRunning Whether to cancel the task if currently running and
      * start a new one.
@@ -1030,8 +1118,18 @@ public class FSUIPC {
         }
 
         try {
+            //init task executor if not initialized yet
+            if (scheduledESForCRPTask == null) {
+                //Creating thread pool with only one thread will make sure that no more than one thread will be processing requests at one time
+                //thus, listener functions that are called from processing thread will have to be completed before the thread can run next time
+                //Hope this will prevent data incosistency that might would occur when the executor would run the same processing code again
+                //before the completion of previous code (which could happen with more than one thread in pool). This would cause data issues where
+                //data in instances that are read by FSUIPC would be overwritten before listener has time to process them, as FSUIPC lib writes the changes
+                //directly into the respective variable memory
+                scheduledESForCRPTask = Executors.newScheduledThreadPool(1);
+            }
             //start our process continual request thread
-            continualRequestProcessThread = scheduledExecutorService.scheduleAtFixedRate(new ContinualRequestsProcessWorker(), 0, repeatPeriod, TimeUnit.MILLISECONDS);
+            continualRequestProcessThread = scheduledESForCRPTask.scheduleAtFixedRate(new ContinualRequestsProcessWorker(), 0, repeatPeriod, TimeUnit.MILLISECONDS);
             logger.log(Level.FINER, "Started thread to process continual requests at period of: {0} miliseconds.", repeatPeriod);
         } catch (Exception ex) {
             logger.log(Level.SEVERE, "Failed to start thread to process continual requests!", ex);
@@ -1096,7 +1194,7 @@ public class FSUIPC {
             registerRequests(arOneTimeRequests);
             registerRequests(arContinualRequests);
 
-            int iRet = process();
+            int iRet = process();            
             //clear the one time requests
             if (iRet == PROCESS_RESULT_OK) {
                 arOneTimeRequests.clear();
