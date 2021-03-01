@@ -16,8 +16,8 @@ Well, the API from Mark Burton and Paul Henty were given for free, this one is a
 
 ## The folders
 
-* **FSUIPC_Java_dist** – the directory with pre-compiled Java package. It should contain the **FSUIPC.jar, fsuipc_java32.dll, fsuipc_java64.dll** and **javadoc** folder. These files are ready to use in your project. The FSUIPC library was written in JDK 11 ([AdoptOpenJDK](https://adoptopenjdk.net/) 11.0.7.10 Hotspot).
-* **FSUIPC** – the directory containing the source code of the FSUIPC.jar library. The project is for [Netbeans](https://netbeans.org/) (Apache Netbeans 12 – to be specific). It was written using JDK 11 , compiled with AdoptOpenJDK 11.0.7.10 Hotspot, and tested also with 32bit JDK 11 ([AdoptOpenJDK](https://adoptopenjdk.net/) 11.0.8.10 Hotspot). This folder contains 3 batch files – **Make JavaDoc.cmd** – to make Javadoc (but not needed actually, Netbeans can do that if setup correctly). The **MakeHeaderFiles32.cmd** and **MakeHeaderFiles64.cmd** will create the header file for the FSUIPCWrapper class (that is the one containing native functions) using the 32/64bit JDK. These header files are then used in the **CWrapper32** (fsuipc_java32.dll) and **CWrapper64** (fsuipc_java64.dll) C++ projects, which implements the native functions. Note that all of these batch files contains absolute paths on my system and therefore WILL NEED adjustments for your system.
+* **FSUIPC_Java_dist** – the directory with pre-compiled Java package. It should contain the **FSUIPC.jar, FSUIPC-javadoc.jar (the javadoc packed in .jar), FSUIPC-sources.jar (source packed in .jar), FSUIPC-test.jar (JUnit tests), fsuipc_java32.dll, fsuipc_java64.dll** and **javadoc** folder. These files are ready to use in your project. The FSUIPC library was last compiled unde JDK 15 ([AdoptOpenJDK](https://adoptopenjdk.net/) 15.0.1.9 Hotspot). Note that for production, only the FSUIPC.jar, fsuipc_java32.dll, fsuipc_java64.dll are need.
+* **FSUIPC** – the directory containing the source code of the FSUIPC.jar library. The project is for [Netbeans](https://netbeans.org/) (Apache Netbeans 12 – to be specific). It was written using JDK 11 , compiled with AdoptOpenJDK 15.0.1.9 Hotspot, and tested also with 32bit JDK 15 ([AdoptOpenJDK](https://adoptopenjdk.net/) 15.0.1.9 Hotspot). This folder contains 3 batch files – **Make JavaDoc.cmd** – to make Javadoc (but not needed actually, Netbeans can do that if setup correctly). The **MakeHeaderFiles32.cmd** and **MakeHeaderFiles64.cmd** will create the header file for the FSUIPCWrapper class (that is the one containing native functions) using the 32/64bit JDK. These header files are then used in the **CWrapper32** (fsuipc_java32.dll) and **CWrapper64** (fsuipc_java64.dll) C++ projects, which implements the native functions. Note that all of these batch files contains absolute paths on my system and therefore WILL NEED adjustments for your system.
 * **CWrapper32** – Contains the source code for the **fsuipc_java32.dll** – the 32bit library version that implements native functions of the **FSUIPCWrapper** java class. It is written in C++. The project is for [Visual Studio](https://visualstudio.microsoft.com/) (C++) 2019. When you open this project in Visual Studio, it will probably need some settings adjustment, as some paths will be different on your system than on mine, but skill-full developer like you will have not big issues with that, I am sure. For sure you will have to set paths to Java JDK header files, so that C++ knows about them (In VS 2019 this is under project properties -> C/C++ -> General -> Additional Include Directories). The folder is pretty BIG as it contains the packages for boost libraries, that the library uses for logging purposes.
 * **CWrapper64** – Contains the source code for the **fsuipc_java64.dll** – the 64bit library version that implements native functions of the **FSUIPCWrapper** java class. It is written in C++. The project is for [Visual Studio](https://visualstudio.microsoft.com/) (C++) 2019. When you open this project in Visual Studio, it will probably need some settings adjustment, as some paths will be different on your system than on mine, but skill-full developer like you will have not big issues with that, I am sure. For sure you will have to set paths to Java JDK header files, so that C++ knows about them (In VS 2019 this is under project properties -> C/C++ -> General -> Additional Include Directories). The folder is pretty BIG as it contains the packages for boost libraries, that the library uses for logging purposes.
 * **FSUIPCSimpleTest** – contains simple sample application that shows the usage of some FSUIPC functionality. It shows the basics of “FSUIPC data request” concept of this SDK, the connection to FSUIPC and reading one time data requests. The project is for Netbeans (Apache Netbeans 12 – to be specific). Some settings adjustment will be required after opening the project. I had the FSUIPC project set as dependency, you can do the same or you can point it to pre-compiled FSUIPC.jar from **FSUIPC_Java_dist**.
@@ -166,5 +166,24 @@ If you want to contact me in regard of this JAVA FSUIPC SDK, you can do so via a
 ## Thanks
 
 Many people behind the flight simulator platforms we use, Pete and John Dowson for FSUIPC, Mark Burton and Paul Henty for their SDK, as it was great starting point for me.
+
+
+## Change log
+
+3.1.2021
+
+* Added: Some Junit tests.
+* Added: Added the LuaHelper, MacroHelper and LVarHelper classes.
+* Added: The FSUIPCLVarLuaMacroTest.java into the FSUIPCSimpleTest project to show the usage of the added classes and to test them.
+* Added: isConnected function to the FSUIPC class.
+* Fixed: Constructors of primitive data request that takes initial value (constructs WRITE data request) always ended with Exception due to missing command.
+
+19.1.2021
+
+* Some internal changes and fixes in the FSUIPC class. For example, it was not possible to start processing requests again after disconnecting/connecting again. Some cleanup was not being done.
+
+25.9.2020
+
+* First release.
 
 

@@ -32,7 +32,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * <h3>General description</h3>
+ * <h2>General description</h2>
  *
  * <p>
  * This is another FSUIPC wrapper class... This one uses {@link FSUIPCWrapper}
@@ -404,7 +404,7 @@ public class FSUIPC {
     }
 
     /**
-     * This function will try to load 3native library that implements this
+     * This function will try to load the 32bit/64bit native library that implements this
      * wrapper native methods. Note that it tries to determine the architecture
      * by reading the "sun.arch.data.model" system property and then call {@link #load32()
      * } or {@link #load64() } based on result. The result can also be
@@ -643,6 +643,16 @@ public class FSUIPC {
             setConnected(false);
         }
         return iRet;
+    }
+    
+    /**
+     * Will return the value of the internal {@link AtomicBoolean} variable that is being updated when
+     * FSUIPC is connected/disconnected.
+     * 
+     * @return True if FSUIPC is connected, false otherwise.
+     */
+    public boolean isConnected() {
+        return this.connected.get();
     }
 
     /**
@@ -933,9 +943,7 @@ public class FSUIPC {
     }
 
     /**
-     * This method will add data request to the continual requests array.This
-     * array will be emptied once successfully processed via the
-     * {@link #processRequestsOnce()} function.
+     * This method will add data request to the continual requests array.
      *
      * @param dataRequest Read or Write data request.
      * @return The passed <b>dataRequest</b> if not null, otherwise null.

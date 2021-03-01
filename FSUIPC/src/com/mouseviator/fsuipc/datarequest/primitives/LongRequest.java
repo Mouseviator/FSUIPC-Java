@@ -16,8 +16,6 @@ import com.mouseviator.fsuipc.datarequest.DataRequest;
 import com.mouseviator.fsuipc.datarequest.IDataRequest;
 import static com.mouseviator.fsuipc.datarequest.DataRequest.MAX_OFFSET_VALUE;
 import static com.mouseviator.fsuipc.datarequest.DataRequest.MIN_OFFSET_VALUE;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.security.InvalidParameterException;
 
 /**
@@ -40,7 +38,7 @@ public class LongRequest extends DataRequest implements IDataRequest<Long> {
      * 
      * @param offset An offset to associate this data request with.
      */ 
-    public LongRequest(int offset) {
+    public LongRequest(int offset) throws InvalidParameterException {
         this();
         if (offset >= MIN_OFFSET_VALUE && offset <= MAX_OFFSET_VALUE) {
             this.offset = offset;
@@ -55,15 +53,12 @@ public class LongRequest extends DataRequest implements IDataRequest<Long> {
      * @param offset An offset to associate this data request with.
      * @param value The actual value.
      */ 
-    public LongRequest(int offset, long value) {
+    public LongRequest(int offset, long value) throws InvalidParameterException {
         this();
         if (offset >= MIN_OFFSET_VALUE && offset <= MAX_OFFSET_VALUE) {
             this.offset = offset;
             
-            final ByteBuffer buf = ByteBuffer.allocate(BUFFER_LENGTH_LONG);
-            buf.order(ByteOrder.LITTLE_ENDIAN);
-            buf.putLong(value);
-            buf.get(dataBuffer);
+            putLong(value);
             
             this.type = RequestType.WRITE;
         } else {
@@ -77,15 +72,12 @@ public class LongRequest extends DataRequest implements IDataRequest<Long> {
      * @param offset An offset to associate this data request with.
      * @param value The actual value.
      */ 
-    public LongRequest(int offset, Long value) {
+    public LongRequest(int offset, Long value) throws InvalidParameterException {
         this();
         if (offset >= MIN_OFFSET_VALUE && offset <= MAX_OFFSET_VALUE) {
             this.offset = offset;
             
-            final ByteBuffer buf = ByteBuffer.allocate(BUFFER_LENGTH_LONG);
-            buf.order(ByteOrder.LITTLE_ENDIAN);
-            buf.putLong(value);
-            buf.get(dataBuffer);
+            putLong(value);
             
             this.type = RequestType.WRITE;
         } else {

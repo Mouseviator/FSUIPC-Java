@@ -16,8 +16,6 @@ import com.mouseviator.fsuipc.datarequest.DataRequest;
 import com.mouseviator.fsuipc.datarequest.IDataRequest;
 import static com.mouseviator.fsuipc.datarequest.DataRequest.MAX_OFFSET_VALUE;
 import static com.mouseviator.fsuipc.datarequest.DataRequest.MIN_OFFSET_VALUE;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.security.InvalidParameterException;
 
 /**
@@ -40,7 +38,7 @@ public class FloatRequest extends DataRequest implements IDataRequest<Float> {
      * 
      * @param offset An offset to associate this data request with.
      */ 
-    public FloatRequest(int offset) {
+    public FloatRequest(int offset) throws InvalidParameterException {
         this();
         if (offset >= MIN_OFFSET_VALUE && offset <= MAX_OFFSET_VALUE) {
             this.offset = offset;                        
@@ -55,15 +53,12 @@ public class FloatRequest extends DataRequest implements IDataRequest<Float> {
      * @param offset An offset to associate this data request with.
      * @param value The actual value.
      */ 
-    public FloatRequest(int offset, float value) {
+    public FloatRequest(int offset, float value) throws InvalidParameterException {
         this();
         if (offset >= MIN_OFFSET_VALUE && offset <= MAX_OFFSET_VALUE) {
             this.offset = offset;
             
-            final ByteBuffer buf = ByteBuffer.allocate(BUFFER_LENGTH_FLOAT);
-            buf.order(ByteOrder.LITTLE_ENDIAN);
-            buf.putFloat(value);
-            buf.get(dataBuffer);
+            putFloat(value);            
             
             this.type = RequestType.WRITE;
         } else {
@@ -77,15 +72,12 @@ public class FloatRequest extends DataRequest implements IDataRequest<Float> {
      * @param offset An offset to associate this data request with.
      * @param value The actual value.
      */ 
-    public FloatRequest(int offset, Float value) {
+    public FloatRequest(int offset, Float value) throws InvalidParameterException {
         this();
         if (offset >= MIN_OFFSET_VALUE && offset <= MAX_OFFSET_VALUE) {
             this.offset = offset;
             
-            final ByteBuffer buf = ByteBuffer.allocate(BUFFER_LENGTH_FLOAT);
-            buf.order(ByteOrder.LITTLE_ENDIAN);
-            buf.putFloat(value);
-            buf.get(dataBuffer);
+            putFloat(value);
             
             this.type = RequestType.WRITE;
         } else {

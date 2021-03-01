@@ -14,8 +14,6 @@ package com.mouseviator.fsuipc.datarequest.primitives;
 
 import com.mouseviator.fsuipc.datarequest.DataRequest;
 import com.mouseviator.fsuipc.datarequest.IDataRequest;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.security.InvalidParameterException;
 
 /**
@@ -38,7 +36,7 @@ public class DoubleRequest extends DataRequest implements IDataRequest<Double> {
      * 
      * @param offset An offset to associate this data request with.
      */  
-    public DoubleRequest(int offset) {
+    public DoubleRequest(int offset) throws InvalidParameterException {
         this();
         if (offset >= MIN_OFFSET_VALUE && offset <= MAX_OFFSET_VALUE) {
             this.offset = offset;                        
@@ -53,15 +51,12 @@ public class DoubleRequest extends DataRequest implements IDataRequest<Double> {
      * @param offset An offset to associate this data request with.
      * @param value The actual value.
      */        
-    public DoubleRequest(int offset, double value) {
+    public DoubleRequest(int offset, double value) throws InvalidParameterException {
         this();
         if (offset >= MIN_OFFSET_VALUE && offset <= MAX_OFFSET_VALUE) {
             this.offset = offset;
             
-            final ByteBuffer buf = ByteBuffer.allocate(BUFFER_LENGTH_DOUBLE);
-            buf.order(ByteOrder.LITTLE_ENDIAN);
-            buf.putDouble(value);
-            buf.get(dataBuffer);
+            putDouble(value);
             
             this.type = RequestType.WRITE;
         } else {
@@ -75,15 +70,12 @@ public class DoubleRequest extends DataRequest implements IDataRequest<Double> {
      * @param offset An offset to associate this data request with.
      * @param value The actual value.
      */        
-    public DoubleRequest(int offset, Double value) {
+    public DoubleRequest(int offset, Double value) throws InvalidParameterException {
         this();
         if (offset >= MIN_OFFSET_VALUE && offset <= MAX_OFFSET_VALUE) {
             this.offset = offset;
             
-            final ByteBuffer buf = ByteBuffer.allocate(BUFFER_LENGTH_DOUBLE);
-            buf.order(ByteOrder.LITTLE_ENDIAN);
-            buf.putDouble(value);
-            buf.get(dataBuffer);
+            putDouble(value);
             
             this.type = RequestType.WRITE;
         } else {

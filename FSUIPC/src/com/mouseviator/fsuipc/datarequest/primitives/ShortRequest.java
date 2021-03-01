@@ -14,8 +14,6 @@ package com.mouseviator.fsuipc.datarequest.primitives;
 
 import com.mouseviator.fsuipc.datarequest.DataRequest;
 import com.mouseviator.fsuipc.datarequest.IDataRequest;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.security.InvalidParameterException;
 
 /**
@@ -38,7 +36,7 @@ public class ShortRequest extends DataRequest implements IDataRequest<Short> {
      * 
      * @param offset An offset to associate this data request with.
      */ 
-    public ShortRequest(int offset) {
+    public ShortRequest(int offset) throws InvalidParameterException {
         this();
         if (offset >= MIN_OFFSET_VALUE && offset <= MAX_OFFSET_VALUE) {
             this.offset = offset;                        
@@ -53,15 +51,12 @@ public class ShortRequest extends DataRequest implements IDataRequest<Short> {
      * @param offset An offset to associate this data request with.
      * @param value The actual value.
      */ 
-    public ShortRequest(int offset, short value) {
+    public ShortRequest(int offset, short value) throws InvalidParameterException {
         this();
         if (offset >= MIN_OFFSET_VALUE && offset <= MAX_OFFSET_VALUE) {
             this.offset = offset;
             
-            final ByteBuffer buf = ByteBuffer.allocate(BUFFER_LENGTH_SHORT);
-            buf.order(ByteOrder.LITTLE_ENDIAN);
-            buf.putShort(value);
-            buf.get(dataBuffer);
+            putShort(value);
             
             this.type = RequestType.WRITE;
         } else {
@@ -75,15 +70,12 @@ public class ShortRequest extends DataRequest implements IDataRequest<Short> {
      * @param offset An offset to associate this data request with.
      * @param value The actual value.
      */ 
-    public ShortRequest(int offset, Short value) {
+    public ShortRequest(int offset, Short value) throws InvalidParameterException {
         this();
         if (offset >= MIN_OFFSET_VALUE && offset <= MAX_OFFSET_VALUE) {
             this.offset = offset;
             
-            final ByteBuffer buf = ByteBuffer.allocate(BUFFER_LENGTH_SHORT);
-            buf.order(ByteOrder.LITTLE_ENDIAN);
-            buf.putShort(value);
-            buf.get(dataBuffer);
+            putShort(value);
             
             this.type = RequestType.WRITE;
         } else {

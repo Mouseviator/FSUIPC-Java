@@ -14,8 +14,6 @@ package com.mouseviator.fsuipc.datarequest.primitives;
 
 import com.mouseviator.fsuipc.datarequest.DataRequest;
 import com.mouseviator.fsuipc.datarequest.IDataRequest;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.security.InvalidParameterException;
 
 /**
@@ -38,7 +36,7 @@ public class IntRequest extends DataRequest implements IDataRequest<Integer> {
      * 
      * @param offset An offset to associate this data request with.
      */ 
-    public IntRequest(int offset) {
+    public IntRequest(int offset) throws InvalidParameterException {
         this();
         if (offset >= MIN_OFFSET_VALUE && offset <= MAX_OFFSET_VALUE) {
             this.offset = offset;            
@@ -53,15 +51,12 @@ public class IntRequest extends DataRequest implements IDataRequest<Integer> {
      * @param offset An offset to associate this data request with.
      * @param value The actual value.
      */ 
-    public IntRequest(int offset, int value) {
+    public IntRequest(int offset, int value) throws InvalidParameterException {
         this();
         if (offset >= MIN_OFFSET_VALUE && offset <= MAX_OFFSET_VALUE) {
             this.offset = offset;
             
-            final ByteBuffer buf = ByteBuffer.allocate(BUFFER_LENGTH_INT);
-            buf.order(ByteOrder.LITTLE_ENDIAN);
-            buf.putInt(value);
-            buf.get(dataBuffer);
+            putInt(value);
             
             this.type = RequestType.WRITE;
         } else {
@@ -75,15 +70,12 @@ public class IntRequest extends DataRequest implements IDataRequest<Integer> {
      * @param offset An offset to associate this data request with.
      * @param value The actual value.
      */ 
-    public IntRequest(int offset, Integer value) {
+    public IntRequest(int offset, Integer value) throws InvalidParameterException {
         this();
         if (offset >= MIN_OFFSET_VALUE && offset <= MAX_OFFSET_VALUE) {
             this.offset = offset;
             
-            final ByteBuffer buf = ByteBuffer.allocate(BUFFER_LENGTH_INT);
-            buf.order(ByteOrder.LITTLE_ENDIAN);
-            buf.putInt(value);
-            buf.get(dataBuffer);
+            putInt(value);
             
             this.type = RequestType.WRITE;
         } else {

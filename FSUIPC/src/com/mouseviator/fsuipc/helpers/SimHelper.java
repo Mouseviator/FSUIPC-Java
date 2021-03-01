@@ -254,7 +254,7 @@ public class SimHelper {
      *  <li><i>FSX (Unknown version)</i> - For FSX, but again, returned value does not match any documented value.</li>
      *  <li><i>FSX Steam Edition, build &lt;build number&gt;</i> - For FSX Steam Edition.</li>
      *  <li><i>Prepar3D &lt;version number&gt;</i> - For respective Prepar3D version.</li>
-     * *  <li><i>Microsoft Flight Simulator (2020)</i> - For Microsoft Flight Simulator , first released at 2020.</li>
+     *  <li><i>Microsoft Flight Simulator (2020)</i> - For Microsoft Flight Simulator , first released at 2020.</li>
      * </ul>
      * 
      * @return Data request that returns string with FSX/P3D version.

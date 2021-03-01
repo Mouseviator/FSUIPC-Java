@@ -1,0 +1,15 @@
+3.1.2021
+
+Added: Some Junit tests.
+Added: Added the LuaHelper, MacroHelper and LVarHelper classes.
+Added: The FSUIPCLVarLuaMacroTest.java into the FSUIPCSimpleTest project to show the usage of the added classes and to test them.
+Added: isConnected function to the FSUIPC class.
+Fixed: Constructors of primitive data request that takes initial value (constructs WRITE data request) always ended with Exception due to missing command.
+
+19.1.2021
+
+Some internal changes and fixes in the FSUIPC class. For example, it was not possible to start processing requests again after disconnecting/connecting again. Some cleanup was not being done.
+
+25.9.2020
+
+First release.

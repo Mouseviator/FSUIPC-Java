@@ -40,7 +40,7 @@ public class ByteArrayRequest extends DataRequest implements IDataRequest<byte[]
      * @param offset An offset to associate this data request with.
      * @param size The number of bytes to allocate for this data request.
      */
-    public ByteArrayRequest(int offset, int size) {
+    public ByteArrayRequest(int offset, int size) throws InvalidParameterException {
         this(size);
         if (offset >= MIN_OFFSET_VALUE && offset <= MAX_OFFSET_VALUE) {
             this.offset = offset;                        
@@ -55,10 +55,11 @@ public class ByteArrayRequest extends DataRequest implements IDataRequest<byte[]
      * @param offset An offset to associate this data request with.
      * @param data An actual data. Note that the array will not be copied, will be used directly.
      */
-    public ByteArrayRequest(int offset, byte[] data) {
+    public ByteArrayRequest(int offset, byte[] data) throws InvalidParameterException {
         if (offset >= MIN_OFFSET_VALUE && offset <= MAX_OFFSET_VALUE) {
             this.offset = offset;       
-            this.dataBuffer = data;
+            //rather copy the data than just assigning reference
+            copyByteArray(data);
             this.type = RequestType.WRITE;
         } else {
             throw new InvalidParameterException("Offset value out of supported range!");
@@ -72,6 +73,6 @@ public class ByteArrayRequest extends DataRequest implements IDataRequest<byte[]
 
     @Override
     public void setValue(byte[] value) {        
-        this.dataBuffer = value;
-    }    
+        copyByteArray(value);
+    }            
 }
