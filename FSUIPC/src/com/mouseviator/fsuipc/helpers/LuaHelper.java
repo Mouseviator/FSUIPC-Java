@@ -547,6 +547,9 @@ public class LuaHelper {
      */
     public static class LuaControlRequest extends DataRequest implements IWriteOnlyRequest<String> {
 
+        /**
+         * This character si used to separate command and arguments when working with lua programs via FSUIPC
+         */
         public static final String COMMAND_SEPARATOR = ":";
 
         private LuaControlRequestCommand command;

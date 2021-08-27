@@ -371,6 +371,30 @@ public abstract class DataRequest {
         //put zero at the end
         dataBuffer[bufferLength - 1] = (byte) 0;
     }
+    
+    /**
+     * This function will convert byte array to string ending at first zero byte.
+     * 
+     * @param charset Charset to use when encoding the string.
+     * @return The contents of underlying byte up to first zero byte buffer converted to String.
+     */
+    protected String getZeroTerminatedString(Charset charset) {        
+        int firstZeroBytePos = dataBuffer.length;
+        for (int i = 0; i < dataBuffer.length; i++) {
+            if (dataBuffer[i] == 0) {
+                firstZeroBytePos = i;
+                break;
+            }
+        }        
+        
+        //check if empty string...
+        if (firstZeroBytePos == 0) {
+            firstZeroBytePos = 1;
+        }
+        
+        String result = new String(dataBuffer, 0, firstZeroBytePos, charset);
+        return result;
+    }
 
     /**
      * This helper function will copy the given byte array into the internal byte array. This will be copy of the

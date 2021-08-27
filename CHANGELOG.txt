@@ -1,3 +1,13 @@
+27.8.2021
+
+The oficial version number is now: 1.0.2
+
+Added: The ValueRetrieveMethod enumeration to the StringRequest class, the variable and the respective get and set methods for this enumeration. It now drives how the underlying byte buffer will be converted to string. Either: TO_FIRST_ZERO_BYTE - will use the added getZeroTerminatedString function, or: WHOLE_BUFFER - which will return the content of the whole buffer. By default, the StringRequest class uses TO_FIRST_ZERO_BYTE. You can change this using the new setValueRetrieveMethod(ValueRetrieveMethod valueRetrieveMethod) function, or by using getValue(ValueRetrieveMethod valueRetrieveMethod), which will not change the stored behavior of the class.
+Added: The getZeroTerminatedString(Charset charset) function to DataRequest class that will return the contents of the underlying byte buffer up to first zero byte converted to String. 
+Changed: Modified build.xml so for the Netbeans project, so it now generates jar files with version number.
+Updates: The respective archives and folders with ready to distributon (compiled) files.
+
+
 3.1.2021
 
 Added: Some Junit tests.

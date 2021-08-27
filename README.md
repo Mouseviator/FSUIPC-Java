@@ -170,6 +170,15 @@ Many people behind the flight simulator platforms we use, Pete and John Dowson f
 
 ## Change log
 
+27.8.2021
+
+The oficial version number is now: 1.0.2
+
+* Added: The [ValueRetrieveMethod](https://www.mouseviator.com/wp-content/uploads/documents/fsuipc_java_sdk_javadoc/com/mouseviator/fsuipc/datarequest/primitives/StringRequest.ValueRetrieveMethod.html) enumeration to the [StringRequest](https://www.mouseviator.com/wp-content/uploads/documents/fsuipc_java_sdk_javadoc/com/mouseviator/fsuipc/datarequest/primitives/StringRequest.html) class, the variable and the respective get and set methods for this enumeration. It now drives how the underlying byte buffer will be converted to string. Either: [TO_FIRST_ZERO_BYTE](https://www.mouseviator.com/wp-content/uploads/documents/fsuipc_java_sdk_javadoc/com/mouseviator/fsuipc/datarequest/primitives/StringRequest.ValueRetrieveMethod.html#TO_FIRST_ZERO_BYTE) - will use the added **getZeroTerminatedString** function, or: [WHOLE_BUFFER](https://www.mouseviator.com/wp-content/uploads/documents/fsuipc_java_sdk_javadoc/com/mouseviator/fsuipc/datarequest/primitives/StringRequest.ValueRetrieveMethod.html#WHOLE_BUFFER) - which will return the content of the whole buffer. By default, the **StringRequest** class uses **TO_FIRST_ZERO_BYTE**. You can change this using the new [setValueRetrieveMethod(ValueRetrieveMethod valueRetrieveMethod)](https://www.mouseviator.com/wp-content/uploads/documents/fsuipc_java_sdk_javadoc/com/mouseviator/fsuipc/datarequest/primitives/StringRequest.html#setValueRetrieveMethod(com.mouseviator.fsuipc.datarequest.primitives.StringRequest.ValueRetrieveMethod)) function, or by using [getValue(ValueRetrieveMethod valueRetrieveMethod)](https://www.mouseviator.com/wp-content/uploads/documents/fsuipc_java_sdk_javadoc/com/mouseviator/fsuipc/datarequest/primitives/StringRequest.html#getValue(com.mouseviator.fsuipc.datarequest.primitives.StringRequest.ValueRetrieveMethod)), which will not change the stored behavior of the class.
+* Added: The [getZeroTerminatedString(Charset charset)](https://www.mouseviator.com/wp-content/uploads/documents/fsuipc_java_sdk_javadoc/com/mouseviator/fsuipc/datarequest/DataRequest.html#getZeroTerminatedString(java.nio.charset.Charset)) function to [DataRequest](https://www.mouseviator.com/wp-content/uploads/documents/fsuipc_java_sdk_javadoc/com/mouseviator/fsuipc/datarequest/DataRequest.html) class that will return the contents of the underlying byte buffer up to first zero byte converted to String. 
+* Changed: Modified build.xml so for the Netbeans project, so it now generates jar files with version number.
+* Updates: The respective archives and folders with ready to distributon (compiled) files.
+
 3.1.2021
 
 * Added: Some Junit tests.

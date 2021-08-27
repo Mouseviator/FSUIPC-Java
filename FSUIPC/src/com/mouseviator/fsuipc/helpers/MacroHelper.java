@@ -380,6 +380,9 @@ public class MacroHelper {
      */
     public static class MacroExecuteRequest extends DataRequest implements IWriteOnlyRequest<String> {
 
+        /**
+         * This character is used to separate macro file name and macro name when calling macro using FSUIPC
+         */
         public static final char MACRO_SEPARATOR = ':';
         private static final byte MAX_MACRO_FILE_LENGHT = 16;
         private static final byte MAX_MACRO_NAME_LENGTH = 16;
